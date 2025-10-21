@@ -38,7 +38,7 @@ class SentenceSplitter:
 		print("Marked text: ", marked_text)
 		fixed_marked_text = self.remove_false_end_of_sentence(marked_text)
 		fixed_marked_text = self.split_unsplit_stuff(fixed_marked_text)
-		print("FIxed Marked text: ", fixed_marked_text)
+		print("Fixed Marked text: ", fixed_marked_text)
 		sentences = re.split(self.EOS, fixed_marked_text)
 		return sentences
 

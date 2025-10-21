@@ -1,5 +1,10 @@
 from flask import Flask, jsonify, request
 from checkText import process_user_text, generate_text, checkText
+from TextChecker import TextChecker
+import SentenceSplitter
+import SpellingChecker
+import Tokenizer
+
 # from checkAndGenerateText import checkAndGenerateUserText
 
 app = Flask(__name__)
@@ -16,11 +21,15 @@ model = T5ForConditionalGeneration.from_pretrained('AOGEC_Model_Output_2')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.eval()
 model.to(device)
+
 print("Torch device:", device)
 print("Model device:", next(model.parameters()).device)
-print(torch.cuda.is_available())
 
-def checkAndGenerateUserText(eachSentence):
+sentence_splitter = SentenceSplitter.SentenceSplitter()
+word_tokenizer = Tokenizer.Tokenizer()
+spellChecker = SpellingChecker.SpellingChecker()
+
+def checkAndCorrectGrammaticalError(eachSentence):
     if not eachSentence:
         return "Input text is empty."
 
@@ -49,12 +58,10 @@ def checkAndGenerateUserText(eachSentence):
                              decoder_start_token_id=model.config.pad_token_id,
                              max_length=max_length
                             )
-
     
     predicted_sentence = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
     return predicted_sentence
-
 
 @app.route('/api/test')
 def testBackend():
@@ -76,8 +83,7 @@ def process_user_text_request():
     
     # print(checkText(text))
     formattedText = "grammar: " + text
-    response = checkAndGenerateUserText(formattedText)  
-
+    response = checkAndCorrectGrammaticalError(formattedText)  
 
     return jsonify({
         'status' : "success",
@@ -88,6 +94,56 @@ def process_user_text_request():
         },
         'msg': 'Text Processed Successfully!',
         }), 200
+
+@app.route('/api/process-user-text', methods=['GET', 'POST'])
+def process():
+    data = request.get_json()
+    text = data.get('userInputText')
+
+    finalResult = []  
+
+    if text:
+        sentences = sentence_splitter.split(text)
+
+        for i, sentence in enumerate(sentences):
+            print(f"Processing sentence {i}: {sentence}")
+            if not sentence.strip():
+                continue
+
+            # Tokenize and spell check
+            tokenList, tokenList_for_whitespace = word_tokenizer.tokenizer(sentence)
+            correctionDict = spellChecker.spellCheck(tokenList)
+            print("Correction dict:", correctionDict)
+
+            # Prepare result object for this sentence
+            sentence_result = {
+                "sentenceIndex": i,
+                "originalSentence": sentence,
+                "spellingCorrections": {},
+                "correctedSentence": ""
+            }
+
+            # If spelling errors found → record them and skip grammar correction 
+            # Otherwise perform grammar correction
+            if correctionDict:
+                sentence_result["spellingCorrections"] = correctionDict
+            else:
+                correctedGrammar = checkAndCorrectGrammaticalError(sentence)
+                sentence_result["correctedSentence"] = correctedGrammar
+
+            finalResult.append(sentence_result)
+
+        return jsonify({
+            "status": "success",
+            "data": finalResult,
+            "msg": "Text Processed Successfully!"
+        }), 200
+
+    return jsonify({
+        "status": "failed",
+        "data": {},
+        "msg": "No Text to Process!"
+    }), 400
 
 if __name__ == '__main__':
     port = 5001
