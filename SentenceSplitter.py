@@ -1,4 +1,3 @@
-# -*- coding: iso-8859-1 -*-
 import string
 import re
 
@@ -10,6 +9,7 @@ class SentenceSplitter:
 	P = """[\.!?]"""				## PUNCTUATION
 	AP = """(?:'|"|�|\)|\]|\})?"""	## AFTER PUNCTUATION
 	PAP = "%s%s" % (P, AP) #[\.!?](?:'|"|�|\)|\]|\})?
+	
 	def __init__(self):
 		"""Init the object by loading the abbreviation list."""
 		self.abbr = self.importAbbr()

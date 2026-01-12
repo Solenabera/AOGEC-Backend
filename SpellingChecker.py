@@ -1,57 +1,72 @@
 import re
 import string
 from collections import Counter
+from functools import lru_cache
 
 class SpellingChecker():
 	"""SpellingChecker"""
 	def __init__(self):
-		self.wordDictionary = Counter(self.words(open('AODic.dic').read()))
+		# self.wordDictionary = Counter(self.words(open('AODic.dic').read()))
+		# self.wordDictionary = Counter(self.words(open('NewAODictionary.dic.txt').read()))
+		
+		words = self.words(open('NewAODictionary.dic.txt').read())
+		self.wordSet = set(words)          # FAST lookup
+		self.wordFreq = Counter(words)     # For ranking
+
+		self.alphabets = string.ascii_lowercase
+		self.ALPHABETS = string.ascii_uppercase
+		self.digits = string.digits
+
 
 	def spellCheck(self, tokenList):
 		"""Main method"""
 		correctDict = {}
-		flag = 0
-		correctionList = []
 
 		for i, word in enumerate(tokenList):
-			corr, cand = self.correction(word.lower())
-			# print(corr,cand)
-			if word[0].isupper():
-				correctionList.append(corr.capitalize())
+			if len(word) <= 2:
+					continue			
 			else:
-				correctionList.append(corr)
-			
-			if word.lower() != corr:
-				flag = 1
-				if word[0].isupper():
-					correctDict[word] = [i.capitalize() for i in cand]
-				else:
-					correctDict[word] = cand
+				# if 
+				corr, cand = self.correction(word.lower())
+				
+				if word.lower() != corr:
+					if word[0].isupper():
+						correctDict[word] = [i.capitalize() for i in cand]
+					else:
+						correctDict[word] = cand
 
 		return correctDict
 
 	def words(self, text):
 		return re.findall(r"[\w']+", text.lower())
-
-	def P(self, word, N = -1):
+	
+	def P(self, word, N=None):
 		"""Probability of `word`."""
-		if N == -1: N = sum(self.wordDictionary.values())
-		return (self.wordDictionary[word]/N)
+		if N is None:
+			N = sum(self.wordFreq.values())
+		return self.wordFreq[word] / N
 
+	@lru_cache(maxsize=50000)
 	def correction(self, word):
 		"""Most probable spelling correction for word."""
 		cand = self.candidates(word)
-		if len(cand)>=5:
+		if len(cand) > 4:
 			cand = cand[:4]
-		return max(cand, key = self.P), cand
+		return max(cand, key=self.P), cand
 
 	def candidates(self, word):
 		"""Generate possible spelling corrections for word."""
-		return (self.known([word]) or self.known(self.edits1(word)) or self.known(self.edits2(word)) or [word])
+		if word in self.wordSet:
+			return [word]   # no edits needed
+		return (
+			self.known(self.edits1(word)) or
+			self.known(self.edits2(word)) or
+			[word]
+		)
 
 	def known(self, words):
 		"""The subset of `words` that appear in the dictionary of WORDS."""
-		return list(set(w for w in words if w in self.wordDictionary))
+		return [w for w in words if w in self.wordSet]
 
 	def edits1(self, word):
 		"""All edits that are one edit away from `word`."""
