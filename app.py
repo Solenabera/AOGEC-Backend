@@ -29,7 +29,7 @@ print("Model device:", next(model.parameters()).device)
 sentence_splitter = SentenceSplitter.SentenceSplitter()
 word_tokenizer = Tokenizer.Tokenizer()
 spellChecker = SpellingChecker.SpellingChecker()
-autocomplete = AutoComplete.AutoComplete(spellChecker.wordSet)
+autocomplete = AutoComplete.AutoComplete(spellChecker.wordSet, spellChecker.wordFreq)
 
 def checkAndCorrectGrammaticalError(eachSentence):
     if not eachSentence:
