@@ -2,7 +2,7 @@ from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import HTTPException
 from bson import ObjectId
-from app.config import settings
+from config import settings
 
 # -----------------------
 # MongoDB setup

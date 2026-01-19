@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from app.config import settings
+from config import settings
 
-from app.routes import text_processing, auth, tasks, word_suggestion
+from routes import text_processing, auth, tasks, word_suggestion
 
-from app.services import auth_service, word_suggestion_service, tasks_management_service
+from services import auth_service, word_suggestion_service, tasks_management_service
 
 # -----------------------
 # FastAPI App
@@ -48,3 +48,6 @@ app.include_router(tasks.router, prefix="/api")
 # if __name__ == "__main__":
 #     # print(f"Starting AOGEC Backend on http://127.0.0.1:{settings.PORT}")
 #     uvicorn.run("app.index:app", host="0.0.0.0", port=settings.PORT, reload=True)
+# # This is important for Vercel
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

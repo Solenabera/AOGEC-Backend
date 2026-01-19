@@ -1,5 +1,5 @@
-from app.nlp import SentenceSplitter, Tokenizer, SpellingChecker, AutoComplete
-from app.dl.inference import check_and_correct, batch_correction
+from nlp import SentenceSplitter, Tokenizer, SpellingChecker, AutoComplete
+from dl.inference import check_and_correct, batch_correction
 
 # NLP Utilities (instantiate once)
 sentence_splitter = SentenceSplitter.SentenceSplitter()

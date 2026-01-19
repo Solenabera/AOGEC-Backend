@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from app.services import word_suggestion_service
+from services import word_suggestion_service
 
 router = APIRouter()
 

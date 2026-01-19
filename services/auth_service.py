@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import HTTPException
 from passlib.context import CryptContext
-from app.config import settings
+from config import settings
 
 # -----------------------
 # Password hashing setup

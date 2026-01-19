@@ -1,5 +1,5 @@
 import torch
-from app.dl.model import tokenizer, model, device
+from dl.model import tokenizer, model, device
 
 def check_and_correct(sentence: str, max_length=128) -> str:
     if not sentence:

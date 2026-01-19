@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from app.services import tasks_management_service
+from services import tasks_management_service
 
 router = APIRouter()
 

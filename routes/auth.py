@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel, EmailStr, constr
-from app.services import auth_service
+from services import auth_service
 
 router = APIRouter()
 
