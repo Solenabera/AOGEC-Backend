@@ -57,7 +57,7 @@ sympy==1.14.0
 tbb==2021.13.1
 tokenizers==0.21.2
 toml==0.10.2
-torch==2.3.1
+torch==2.5.1
 tqdm==4.67.1
 transformers==4.53.1
 typing-inspection==0.4.2
@@ -68,4 +68,5 @@ uvicorn==0.30.6
 watchfiles==1.1.1
 websockets==16.0
 Werkzeug==3.1.3
+
 
