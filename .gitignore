@@ -1,0 +1,29 @@
+# Virtual environments
+venv/
+new_venv/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env
+
+# Model outputs
+AOGEC_Model_Output_1/
+AOGEC_Model_Output_2/
+*.pkl
+*.h5
+*.pt
+*.onnx
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Editor and OS files
+.vscode/
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
