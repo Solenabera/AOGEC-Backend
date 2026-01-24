@@ -18,7 +18,6 @@ class SuggestNewWordRequest(BaseModel):
 # -------------------------
 @router.post("/suggest_new_word")
 async def suggest_new_word(payload: SuggestNewWordRequest):
-    print(payload)
     result = await word_suggestion_service.suggest_new_word(
         payload.newWord,
         payload.IPAddress,

@@ -50,10 +50,15 @@ async def register_user(
     last_name: str,
     phone_number: str
 ):
-    print(email)
     existing = await users_collection.find_one({"emailAddress": email.lower()})
     if existing:
-        raise HTTPException(status_code=400, detail="Email already registered.")
+        raise HTTPException(
+            status_code=400, 
+            detail={
+                "msg": "Email already registered.",
+                "data": {}
+            }
+    )
 
     hashed_pw = hash_password(password)
 
@@ -79,18 +84,30 @@ async def register_user(
 async def login_with_email_password(email: str, password: str):
     user = await users_collection.find_one({"emailAddress": email.lower()})
     if not user:
-        raise HTTPException(status_code=404, detail="No account found for this Email.")
+        raise HTTPException(
+            status_code=404, 
+            detail={
+                "msg": "No account found for this Email.",
+                "data": {}
+            }
+        )                
 
     if user["status"] == "Restricted":
         raise HTTPException(
             status_code=403,
-            detail="Account is restricted due to multiple failed login attempts."
+            detail={
+                "msg": "Account is restricted due to multiple failed login attempts.",
+                "data": {}
+            }
         )
 
     if user["status"] == "Pending":
         raise HTTPException(
             status_code=403,
-            detail="Account is pending. Please complete registration."
+            detail={
+                "msg": "Account is pending. Please complete registration.",
+                "data": {}
+            }
         )
 
     # Verify password
@@ -106,7 +123,13 @@ async def login_with_email_password(email: str, password: str):
             {"$set": update}
         )
 
-        raise HTTPException(status_code=401, detail="Incorrect password.")
+        raise HTTPException(
+            status_code=401, 
+            detail={
+                "msg": "Incorrect password.",
+                "data": {}
+            }
+        )
 
     # Reset login attempt and update last login
     await users_collection.update_one(

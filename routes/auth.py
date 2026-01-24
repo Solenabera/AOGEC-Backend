@@ -9,7 +9,7 @@ router = APIRouter()
 # -------------------------
 class LoginRequest(BaseModel):
     emailAddress: EmailStr
-    password: constr(min_length=8)
+    password: str
 
 class SignupRequest(BaseModel):
     emailAddress: EmailStr
@@ -24,7 +24,6 @@ class SignupRequest(BaseModel):
 # -------------------------
 @router.post("/login_user")
 async def login_user(payload: LoginRequest):
-    print("Logging in...")
     result = await auth_service.login_with_email_password(payload.emailAddress, payload.password)
     return {
         "status": "success",

@@ -39,7 +39,10 @@ async def suggest_new_word(
     if existing:
         raise HTTPException(
             status_code=400,
-            detail="This word is already suggested."
+            detail={
+                "msg": "This word is already suggested.",
+                "data": {}
+            }
         )
 
     word = {
