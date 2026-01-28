@@ -30,7 +30,7 @@ def process_text(text: str):
             "correctedSentence": ""
         }
 
-        if not correction_dict:
+        if not correction_dict and len(tokens) >= 3:
             grammar_candidates.append(sentence)
             grammar_indexes.append(len(final_result))
 
