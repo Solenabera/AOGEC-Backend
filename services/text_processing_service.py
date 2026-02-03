@@ -30,20 +30,35 @@ def process_text(text: str):
             "correctedSentence": ""
         }
 
+        # collect sentences for grammar correction
         if not correction_dict and len(tokens) >= 3:
             grammar_candidates.append(sentence)
             grammar_indexes.append(len(final_result))
 
         final_result.append(result)
 
-    # Grammar correction
-    corrected_sentences = batch_correction(grammar_candidates)
+    # Grammar correction (batch)
+    if grammar_candidates:
+        corrected_sentences = batch_correction(grammar_candidates)
 
-    for idx, corrected in zip(grammar_indexes, corrected_sentences):
-        final_result[idx]["correctedSentence"] = corrected
+        for idx, corrected in zip(grammar_indexes, corrected_sentences):
+            final_result[idx]["correctedSentence"] = corrected
+
+    # ✅ Capitalize sentences safely
+    for item in final_result:
+        if item.get("originalSentence"):
+            item["originalSentence"] = item["originalSentence"].capitalize()
+
+        if item.get("correctedSentence"):
+            item["correctedSentence"] = item["correctedSentence"].capitalize()
 
     return final_result
 
 
 def autocomplete_suggestions(query: str):
     return autocomplete_engine.suggest(query)
+
+
+# Utility function (kept for reuse elsewhere)
+def capitalize_sentences(sentences):
+    return [s.capitalize() for s in sentences if isinstance(s, str)]
