@@ -63,15 +63,15 @@ async def save_feedback(
 # Fetch My GEC Tasks
 # -----------------------
 
-# async def fetch_my_gec_tasks(emailAddress: str):
-#     if sentences_collection is None:
-#         raise HTTPException(status_code=500, detail="Database not initialized")
+async def collected_feedbacks():
+    if feedback_collection is None:
+        raise HTTPException(status_code=500, detail="Database not initialized")
 
-#     tasks_cursor = sentences_collection.find({"emailAddress": emailAddress.lower()})
-#     tasks = await tasks_cursor.to_list(length=None)
+    tasks_cursor = feedback_collection.find()
+    tasks = await tasks_cursor.to_list(length=None)
 
-#     if len(tasks) == 0:
-#         raise HTTPException(status_code=404, detail="You have no saved tasks!")
+    if len(tasks) == 0:
+        raise HTTPException(status_code=404, detail="You have no saved feedback!")
 
-#     return serialize_docs(tasks)
+    return serialize_docs(tasks)
 

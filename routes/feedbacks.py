@@ -15,9 +15,8 @@ class SaveFeedbackRequest(BaseModel):
     fullname: str | None = None
     emailAddress: str | None = None
     
-class FetchMyAOAbbreviationTasksRequest(BaseModel):
-    emailAddress: EmailStr
-
+class FetchFeedbackRequest(BaseModel):
+    pass
 # -------------------------
 # Endpoints
 # -------------------------
@@ -45,14 +44,13 @@ async def save_new_sentence(payload: SaveFeedbackRequest):
         "data": result
     }
 
-# @router.post("/fetch_my_ao_abbreviation_tasks")
-# async def fetch_my_ao_abbreviation_tasks(payload: FetchMyAOAbbreviationTasksRequest):
-#     result = await feedback_management_service.fetch_my_ao_abbreviation_tasks(
-#         emailAddress=payload.emailAddress
-#     )
+@router.post("/collected_feedbacks")
+async def collected_feedbacks():
+    result = await feedback_management_service.collected_feedbacks(
+    )
 
-#     return {
-#         "status": "success",
-#         "msg": "Abbrevations fetched successfully.",
-#         "data": result
-#     }
+    return {
+        "status": "success",
+        "msg": "Feedbacks fetched successfully.",
+        "data": result
+    }
