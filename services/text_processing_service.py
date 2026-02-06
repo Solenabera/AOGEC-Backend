@@ -10,7 +10,7 @@ autocomplete_engine = AutoComplete.AutoComplete(
     spell_checker.wordFreq
 )
 
-def process_text(text: str):
+def process_text(text: str, selectedCorrectionType: str, IPAddress: str, userId: int | None):
     sentences = sentence_splitter.split(text)
     final_result = []
     grammar_candidates = []
@@ -30,17 +30,17 @@ def process_text(text: str):
             "correctedSentence": ""
         }
 
-        # collect sentences for grammar correction
-        if not correction_dict and len(tokens) >= 3:
-            grammar_candidates.append(sentence)
-            grammar_indexes.append(len(final_result))
+        # Only collect for grammar correction if not spelling-only
+        if selectedCorrectionType != "Spelling":
+            if not correction_dict and len(tokens) >= 3:
+                grammar_candidates.append(sentence)
+                grammar_indexes.append(len(final_result))
 
         final_result.append(result)
 
-    # Grammar correction (batch)
-    if grammar_candidates:
+    # Grammar correction (batch) only if not spelling-only
+    if selectedCorrectionType != "Spelling" and grammar_candidates:
         corrected_sentences = batch_correction(grammar_candidates)
-
         for idx, corrected in zip(grammar_indexes, corrected_sentences):
             final_result[idx]["correctedSentence"] = corrected
 
@@ -53,7 +53,6 @@ def process_text(text: str):
             item["correctedSentence"] = item["correctedSentence"].capitalize()
 
     return final_result
-
 
 def autocomplete_suggestions(query: str):
     return autocomplete_engine.suggest(query)

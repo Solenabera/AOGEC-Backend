@@ -1,13 +1,17 @@
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
+from typing import Optional
 from services import text_processing_service
 
 router = APIRouter()
 
 class TextRequest(BaseModel):
     userInputText: str
+    selectedCorrectionType: str
+    IPAddress: str
+    userId: Optional[str] = None 
 
-@router.get("/test")
+@router.get("/healthcheck")
 def test_backend():
     return {"message": "Hello! This is test from the backend!"}
 
@@ -27,10 +31,14 @@ def check_user_text(payload: TextRequest):
 @router.post("/process-user-text")
 def process_user_text(payload: TextRequest):
     text = payload.userInputText.strip()
+    selectedCorrectionType = payload.selectedCorrectionType.strip()
+    IPAddress = payload.IPAddress.strip()
+    userId = payload.userId.strip() if payload.userId else None
+
     if not text:
         raise HTTPException(status_code=400, detail="No Text to Process!")
 
-    final_result = text_processing_service.process_text(text)
+    final_result = text_processing_service.process_text(text, selectedCorrectionType, IPAddress, userId)
     return {
         "status": "success",
         "data": final_result,
