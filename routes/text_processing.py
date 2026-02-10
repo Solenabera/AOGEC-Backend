@@ -11,6 +11,9 @@ class TextRequest(BaseModel):
     IPAddress: str
     userId: Optional[str] = None 
 
+class TextRequestForGemini(BaseModel):
+    userInputText: str
+
 @router.get("/healthcheck")
 def test_backend():
     return {"message": "Hello! This is test from the backend!"}
@@ -43,6 +46,24 @@ def process_user_text(payload: TextRequest):
         "status": "success",
         "data": final_result,
         "msg": "Text Processed Successfully!"
+    }
+
+@router.post("/process-user-text-gemini")
+def process_user_text_gemini(payload: TextRequestForGemini):
+    text = payload.userInputText.strip()
+
+    if not text:
+        raise HTTPException(status_code=400, detail="No Text to Process!")
+
+    try:
+        result = text_processing_service.process_user_text_using_gemini(text)
+    except ValueError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+    return {
+        "status": "success",
+        "data": result,
+        "msg": "Text Processed Successfully using Gemini!"
     }
 
 @router.get("/autocomplete")
