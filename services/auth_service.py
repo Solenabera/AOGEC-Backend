@@ -48,7 +48,8 @@ async def register_user(
     first_name: str,
     middleName: str,
     last_name: str,
-    phone_number: str
+    phone_number: str,
+    role: str
 ):
     existing = await users_collection.find_one({"emailAddress": email.lower()})
     if existing:
@@ -70,6 +71,7 @@ async def register_user(
         "emailAddress": email.lower(),
         "password": hashed_pw,
         "status": "Active",
+        "role": role,
         "loginAttempt": 0,
         "createdAt": datetime.utcnow(),
         "lastLogin": None,
@@ -83,6 +85,7 @@ async def register_user(
 # -----------------------
 async def login_with_email_password(email: str, password: str):
     user = await users_collection.find_one({"emailAddress": email.lower()})
+    print(f"Login attempt for email: {email}, found user: {user is not None}")
     if not user:
         raise HTTPException(
             status_code=404, 
@@ -156,5 +159,6 @@ async def login_with_email_password(email: str, password: str):
             "lastName": user["lastName"],
             "phoneNumber": user["phoneNumber"],
             "emailAddress": user["emailAddress"],
+            "role": user["role"]
         }
     }

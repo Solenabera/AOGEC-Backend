@@ -18,12 +18,14 @@ class SignupRequest(BaseModel):
     middleName: str
     lastName: str
     phoneNumber: str
+    role: str
 
 # -------------------------
 # Endpoints
 # -------------------------
 @router.post("/login_user")
 async def login_user(payload: LoginRequest):
+    print(f"Received login request: {payload}")
     result = await auth_service.login_with_email_password(payload.emailAddress, payload.password)
     return {
         "status": "success",
@@ -39,7 +41,8 @@ async def register_user(payload: SignupRequest):
         payload.firstName,
         payload.middleName,
         payload.lastName,
-        payload.phoneNumber
+        payload.phoneNumber,
+        payload.role
     )
     return {
         "status": "success",

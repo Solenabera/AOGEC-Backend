@@ -156,31 +156,55 @@ def _parse_gemini_response(raw_text: str):
 
 
 def process_user_text_using_gemini_batch(sentences: list[str]):
-    prompt = f"""You are an Afaan Oromo language expert.
+    CATEGORIES = [
+        "subject–adjective-agreement-errors",
+        "subject–verb-agreement-errors",
+        "word-order-errors",
+        "adverb–verb-agreement-errors",
+        "subject–adverb-agreement-errors"
+    ]
+
+    prompt = f"""
+You are an Afaan Oromo language expert.
 
 Check each sentence for grammar and punctuation errors.
 Return ALL reasonable corrected versions for each sentence.
+
+For each sentence, classify the error into one of the following categories:
+{CATEGORIES}
 
 Respond with ONLY valid JSON array (no extra text).
 Each item must contain:
 - sentenceIndex (number)
 - candidateSuggestions (array of strings)
-- errorDescriptionEnglish (string)
+- errorDescriptionEnglish (string, one of the above categories or 'No errors detected')
 - errorDescriptionAfaanOromo (string)
 
-If a sentence is correct, return the original sentence as the only candidate suggestion.
-Use 'No errors detected' / 'Dogoggorri hin jiru' for descriptions.
+If a sentence is correct, return the original sentence as the only candidate suggestion and 'No errors detected' for errorDescriptionEnglish.
+Use 'Dogoggorri hin jiru' for descriptions.
 
 Input:
 {json.dumps([{"sentenceIndex": i, "text": s} for i, s in enumerate(sentences)], ensure_ascii=False)}
 """
 
-    model = _get_gemini_model()
-    response = model.generate_content(prompt)
-    raw_text = response.text if hasattr(response, "text") else str(response)
-    return _parse_gemini_batch_response(raw_text, len(sentences))
+    try:
+        model = _get_gemini_model()
+        response = model.generate_content(prompt)
+        raw_text = response.text if hasattr(response, "text") else str(response)
+        return _parse_gemini_batch_response(raw_text, len(sentences))
+    except Exception:
+        # Return only errorDescriptionEnglish and errorDescriptionAfaanOromo for error category
+        error_type = "Unknown error type"
+        return [
+            {
+                "candidateSuggestions": [],
+                "errorDescriptionEnglish": error_type,
+                "errorDescriptionAfaanOromo": error_type,
+            }
+            for _ in range(len(sentences))
+        ]
 
-def process_user_text_using_gemini(text: str):
+# def process_user_text_using_gemini(text: str):
     prompt = f"""You are an Afaan Oromo language expert.
 
 Analyze the following Afaan Oromo text for:
@@ -212,3 +236,41 @@ Text: {text}
     response = model.generate_content(prompt)
     raw_text = response.text if hasattr(response, "text") else str(response)
     return _parse_gemini_response(raw_text)
+
+CATEGORIES = [
+    "subject–adjective-agreement-errors",
+    "subject–verb-agreement-errors",
+    "word-order-errors",
+    "adverb–verb-agreement-errors",
+    "subject–adverb-agreement-errors"
+]
+
+def process_user_text_using_gemini(text: str):
+
+    prompt = f"""
+Analyze the following sentence and identify the grammatical error.
+
+Instead of giving a description, classify the error into one of the following categories:
+
+{CATEGORIES}
+
+Return the response in the SAME format as before, but replace the description field
+with the category name.
+
+Sentence:
+{text}
+"""
+
+    try:
+        model = _get_gemini_model()
+        response = model.generate_content(prompt)
+        print("Gemini raw response:\n", response)  # Debug print
+        raw_text = response.text if hasattr(response, "text") else str(response)
+        return _parse_gemini_response(raw_text)
+    except Exception:
+        return {
+            "candidateSuggestions": [],
+            "errorDescriptionEnglish": "Internal Server Error. Please try again later",
+            "errorDescriptionAfaanOromo": "Internal Server Error. Please try again later",
+            "raw": ""
+        }

@@ -10,5 +10,6 @@ class UserInfo(BaseModel):
     emailAddress: EmailStr
     password: str
     status: str
+    role: str
     loginAttempt: int = 0
     lastLogin: datetime = Field(default_factory=datetime.utcnow)
