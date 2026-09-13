@@ -47,6 +47,7 @@ app.include_router(word_suggestion.router, prefix="/api")
 app.include_router(tasks.router, prefix="/api")
 app.include_router(feedbacks.router, prefix="/api")
 
+
 if __name__ == "__main__":
     print(f"Starting AOGEC Backend on http://127.0.0.1:{settings.PORT}")
     uvicorn.run("main:app", host="0.0.0.0", port=settings.PORT, reload=True)
