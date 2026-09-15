@@ -1,4 +1,6 @@
+import certifi
 from datetime import datetime
+# pyrefly: ignore [missing-import]
 from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import HTTPException
 from bson import ObjectId

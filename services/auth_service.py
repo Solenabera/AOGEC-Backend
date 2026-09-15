@@ -59,7 +59,7 @@ async def register_user(
                 "msg": "Email already registered.",
                 "data": {}
             }
-    )
+        )
 
     hashed_pw = hash_password(password)
 
@@ -84,7 +84,9 @@ async def register_user(
 # Login User
 # -----------------------
 async def login_with_email_password(email: str, password: str):
+    print(email)
     user = await users_collection.find_one({"emailAddress": email.lower()})
+    print(user)
     print(f"Login attempt for email: {email}, found user: {user is not None}")
     if not user:
         raise HTTPException(
