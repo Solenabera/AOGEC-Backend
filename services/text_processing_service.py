@@ -16,8 +16,9 @@ autocomplete_engine = AutoComplete.AutoComplete(
 # --- Hugging Face Client Setup ---
 @lru_cache(maxsize=1)
 def get_hf_client():
-    # Connects directly to your deployed Gradio app
-    return Client("solenabera55/AOGEC")
+    # Connects directly to your deployed Gradio app using your private token
+    return Client("solenabera55/AOGEC", token=settings.HF_TOKEN)
+
 
 def process_text(text: str, selectedCorrectionType: str, IPAddress: str, userId: int | None):
     sentences = sentence_splitter.split(text)
@@ -64,7 +65,7 @@ def process_text(text: str, selectedCorrectionType: str, IPAddress: str, userId:
             corrected_text, breakdown = client.predict(
                 input_payload
             )
-            
+            # print(corrected_text)
             # Split the returned string back into a list
             corrected_sentences = [s.strip() for s in corrected_text.split('\n') if s.strip()]
             
